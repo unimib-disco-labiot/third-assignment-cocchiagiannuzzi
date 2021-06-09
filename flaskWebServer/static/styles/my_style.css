@@ -1,0 +1,18 @@
+.has-backgroundcolor-dark-blue{
+    background-color: #3f6174;
+}
+.has-backgroundcolor-blue{
+    background-color: #3387b5;
+    color: #b8d7e9;
+}
+.value-box{
+    background-color: #3387b5;
+    color: #b8d7e9;
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+.has-text-light-blue{
+    color: #b8d7e9;
+}
+
+

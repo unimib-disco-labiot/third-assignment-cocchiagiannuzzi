@@ -1,0 +1,10 @@
+{
+    "mqtt_settings":{
+        "TEMPLATES_AUTO_RELOAD": "True",
+        "MQTT_BROKER_URL": "149.132.178.180",
+        "MQTT_BROKER_PORT": 1883,
+        "MQTT_USERNAME": "lcocchia",
+        "MQTT_PASSWORD": "iot793569",
+        "MQTT_REFRESH_TIME": 1.0
+    }
+}

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html class="has-backgroundcolor-dark-blue">
+<head>
+    {#    <meta http-equiv="refresh" content="2">#}
+    {% block header %} {% endblock %}
+</head>
+
+<body>
+<section class="section">
+    <h1 class="title is-1 pt-5 pb-2 has-text-centered has-text-light-blue">
+        {% block title %} {% endblock %}
+    </h1>
+    {% if devices == [] %}
+        <div class="container">
+            <div class="ml-6 mr-6">
+                <article class="message is-dark">
+                    <div class="message-header">
+                        <p></p>
+                    </div>
+                    <div class="message-body">
+                        No devices connected!
+                    </div>
+                </article>
+            </div>
+        </div>
+    {% endif %}
+    {% for device in devices %}
+        <div class="container">
+            <div class="ml-6 mr-6">
+                <h1 name="{{ device.MAC_address }}"
+                    class="subtitle is-3 pt-5 pb-3 has-text-centered has-text-light-blue">
+                    Device {{ loop.index0 }}: {{ device.MAC_address }}
+                </h1>
+            </div>
+
+            {#                    <iframe name="frameSens" style="display:none;"></iframe>#}
+            {#                    <form action = "#" method = "post" target="frameSens">#}
+
+            <div id="here{ device.MAC_address }}"
+                 class="columns is-3 has-text-centered pl-6 pr-6 is-multiline is-mobile"> {# Sensors div #}
+                {% for sensor in device.sensors %}
+                    {% for reading in sensor.readings %}
+                        <div class="column is-one-quarter"> {# Sensor box #}
+                            <div class=" box value-box">
+                                <iframe name="iframe{{ reading.name }}" style="display:none;"></iframe>
+                                <form name="form{{ reading.name }}" action="#" method="post"
+                                      target="iframe{{ reading.name }}">
+                                    <input type='hidden' name="mac_address" value="{{ device.MAC_address }}">
+                                    <input type='hidden' name="sensor_name" value="{{ sensor.name }}">
+                                    <input type='hidden' name="reading_name" value="{{ reading.name }}">
+                                    <input type='hidden' name="form" value="reading">
+                                    <span class="icon is-large">  {# ICON #}
+                                        <i class="fas fa-2x fa-{{ reading.icon }}"></i>
+                                    </span> {# ICON #}
+                                    <p class="is-size-4">{{ reading.name }}</p>
+                                    <br>
+                                    <p class="is-size-6">
+                                        {{ reading.value }}
+                                        {% if reading.unit == "C" %}
+                                            °{{ reading.unit }}
+                                        {% else %}
+                                            {{ reading.unit }}
+                                        {% endif %}
+                                    </p>
+                                    <br>
+{#                                    {% if reading.name == "PIR Sensor" %} {# TODO type sensor #}
+{#                                        <input class="slider has-output is-fullwidth" type="range"#}
+{#                                               style="visibility: hidden">#}
+{#                                    {% else %}#}
+{#                                        <input name="threshold" id="slider{{ reading.name }}"#}
+{#                                               oninput="outputslider{{ reading.name }}.value=parseInt(slider{{ reading.name }}.value)"#}
+{#                                               class="slider has-output is-fullwidth"#}
+{#                                               min={{ reading.min_threshold }} max={{ reading.max_threshold }}#}
+{#                                               value={{ reading.threshold }} step="1"#}
+{#                                               type="range" onchange="this.form.submit()">#}
+{#                                        <output for="slider{{ reading.name }}" id="outputslider{{ reading.name }}"#}
+{#                                                value={{ reading.threshold }}>{{ reading.threshold }}</output>#}
+{#                                    {% endif %}#}
+                                </form>
+                            </div>
+                        </div> {# /Sensor box #}
+
+                    {% endfor %}
+                {% endfor %}
+                {% for actuator in device.actuators %}
+                    <div class="column is-one-quarter">
+                    <div class=" box value-box" style="height: 204px">
+{#                        <div class=" box value-box" style="height: 263.75px">#}
+{#                            <span class="icon is-large" style="visibility: hidden">  {# ICON #}
+{#                                <i class="fas fa-2x fa-power-off"></i>#}
+{#                            </span> {# ICON #}
+                            <iframe name="iframe{{ actuator.name }}" style="display:none;"></iframe>
+                            <form name="form{{ actuator.name }}" action="#" method="post"
+                                  target="iframe{{ actuator.name }}">
+                                <input type='hidden' name="mac_address" value="{{ device.MAC_address }}">
+                                <input type='hidden' name="form" value="actuator">
+                                <input type='hidden' name="actuator_name" value="{{ actuator.name }}">
+                                <p class="is-size-4">{{ actuator.name }}: </p>
+                                <p class="is-size-5 pt-2 pb-5">{{ actuator.state }}</p>
+                                <input type='hidden' name="state" value="{{ not actuator.state }}">
+                                <button class="button is-link is-light" type="submit" formmethod="post">Change state
+                                </button>
+
+                            </form>
+                        </div>
+                    </div>
+
+                {% endfor %}
+            </div>
+{# /Sensors div #}
+{#            <iframe name="iframe{{ device.name }}" style="display:none;"></iframe>#}
+{#            <form name="form{{ device.name }}" action="#" method="post" target="iframe{{ device.name }}">#}
+{#                <input type='hidden' name="mac_address" value="{{ device.MAC_address }}">#}
+{#                <input type='hidden' name="form" value="switch">#}
+{#                <div class="columns has-text-centered pl-6 pr-6"> {# Switch DIV #}
+{#                    <div class="column">#}
+{#                        <div class="field box value-box">#}
+{#                            <p class="is-size-5">Write on INFLUXDB:</p><br>#}
+{#                            <input type='hidden' id="switchInflux{{ device.MAC_address }}Hidden" name="switchInflux"#}
+{#                                   value="{{ device.switchInflux }}">#}
+{#                            {% if device.switchInflux == 'ON' %}#}
+{#                                <input onchange="changeLabel(this);" id="switchInflux{{ device.MAC_address }}"#}
+{#                                       type="checkbox" class="switch is-rounded" checked>#}
+{#                            {% else %}#}
+{#                                <input onchange="changeLabel(this);" id="switchInflux{{ device.MAC_address }}"#}
+{#                                       type="checkbox" class="switch is-rounded" >#}
+{#                            {% endif %}#}
+{#                            <label for="switchInflux{{ device.MAC_address }}">{{ device.switchInflux }}</label>#}
+{##}
+{##}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="column">#}
+{#                        <div class="field box value-box">#}
+{#                            <p class="is-size-5">Write on MYSQL:</p><br>#}
+{#                            <input type='hidden' id="switchMYSQL{{ device.MAC_address }}Hidden" name="switchMYSQL"#}
+{#                                   value="{{ device.switchMYSQL }}">#}
+{#                            <input onchange="changeLabel(this);" id="switchMYSQL{{ device.MAC_address }}"#}
+{#                                   type="checkbox" class="switch is-rounded">#}
+{#                            <label for="switchMYSQL{{ device.MAC_address }}">{{ device.switchMYSQL }}</label>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    {% for sensor in device.sensors %}#}
+{#                        {% for reading in sensor.readings %}#}
+{#                            {% if reading.name == "PIR sensor" %} {# TODO type sensor #}
+{#                                <div class="column">#}
+{#                                    <div class="field box value-box">#}
+{#                                        <p class="is-size-5">PIR Alarm:</p><br>#}
+{#                                        <input type='hidden' id="switchPIR{{ device.MAC_address }}Hidden" name="switchPIR"#}
+{#                                               value="ON">#}
+{#                                        <input onchange="changeLabel(this);" id="switchPIR{{ device.MAC_address }}"#}
+{#                                               type="checkbox" class="switch is-rounded">#}
+{#                                        <label for="switchPIR{{ device.MAC_address }}">OFF</label>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            {% endif %}#}
+{#                        {% endfor %}#}
+{#                    {% endfor %}#}
+        </div>
+        </form>
+        {# Switch DIV #}
+        </div>
+    {% endfor %}
+
+    {% if devices %}
+        <div class="container mt-6">
+        <iframe name="iframeInflux" style="display:none;"></iframe>
+        <form name="formInflux" action="#" method="post" target="iframeInflux">
+        <input type='hidden' name="form" value="switch">
+        <div class="columns has-text-centered pl-6 pr-6"> {# Switch DIV #}
+            <div class="column">
+                <div class="field box value-box">
+                    <p class="is-size-5">Write on INFLUXDB:</p><br>
+                    <input type='hidden' id="switchInfluxHidden" name="active"
+                           value="{{ influx }}">
+                    {% if influx == True %}
+                        <input onchange="changeLabel(this);" id="switchInflux"
+                               type="checkbox" class="switch is-rounded" checked>
+                        <label for="switchInflux">ON</label>
+                    {% else %}
+                        <input onchange="changeLabel(this);" id="switchInflux"
+                               type="checkbox" class="switch is-rounded">
+                        <label for="switchInflux">OFF</label>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</section>
+</body>
+</html>
