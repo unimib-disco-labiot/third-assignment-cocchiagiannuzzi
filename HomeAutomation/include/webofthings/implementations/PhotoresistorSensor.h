@@ -16,7 +16,7 @@ public:
         startTicker();
     }
 
-    void tick(){
+    void sensorTick() override {
         int lightSensorValue = analogRead(photoresistor);
         getLightReading()->setValue(new ReadingInt(lightSensorValue));
         notifyMQTTClient();

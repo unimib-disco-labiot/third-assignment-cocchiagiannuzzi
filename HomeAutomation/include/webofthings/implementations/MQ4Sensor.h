@@ -53,7 +53,7 @@ public:
         startTicker();
     }
     
-    void tick() override {
+    void sensorTick() override {
         MQ4->update();
 
         MQ4->setA(-0.318); 

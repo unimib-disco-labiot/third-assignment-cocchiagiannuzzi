@@ -19,7 +19,7 @@ public:
         startTicker();
     }
 
-    void tick(){
+    void sensorTick() override{
         bool b;
         if(digitalRead(pin)==HIGH){
             b = true;

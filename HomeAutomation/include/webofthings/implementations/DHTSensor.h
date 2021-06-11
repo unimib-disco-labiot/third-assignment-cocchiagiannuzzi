@@ -26,7 +26,7 @@ public:
         startTicker();
     }
 
-    void tick(){
+    void sensorTick() override{
         float temperature = dht->readTemperature();
         float humidity = dht->readHumidity();  
         

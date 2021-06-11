@@ -69,5 +69,11 @@ Reading* WoTSensor::findReading(const String& readingName) const {
     return nullptr;
 }
 
-void WoTSensor::tick() {}
+void WoTSensor::sensorTick() {}
+
+void WoTSensor::tick() {
+    sensorTick();
+    //TODO: Handle Events
+}
+
 void WoTSensor::init() {}

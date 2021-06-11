@@ -19,7 +19,7 @@ public:
         startTicker();
     }
 
-    void tick(){
+    void sensorTick() override{
         if(WiFi.isConnected()) {
             int rssi = WiFi.RSSI();
             // print("WiFi RSSI: ");

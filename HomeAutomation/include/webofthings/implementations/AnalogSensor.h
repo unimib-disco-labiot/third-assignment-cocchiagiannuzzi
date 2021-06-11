@@ -26,7 +26,7 @@ public:
         startTicker();
     }
 
-    void tick(){
+    void sensorTick() override{
         int value = analogRead(analogPin);
         int percentage = value * 100 / 1024; 
         getAnalogReading()->setValue(percentage);

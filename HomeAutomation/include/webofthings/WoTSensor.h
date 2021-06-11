@@ -27,7 +27,10 @@ public:
     void addReading(Reading* reading);
     
     virtual void init();
-    virtual void tick();
+    
+    void tick() override;
+    virtual void sensorTick();
+
 
     const std::vector<Reading*>& getReadings() const;
     const String& getName() const;

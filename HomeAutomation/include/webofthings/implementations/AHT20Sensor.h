@@ -38,7 +38,7 @@ public:
         startTicker();
     }
     
-    void tick() override {
+    void sensorTick() override {
         sensors_event_t humidity, temp;
         aht.getEvent(&humidity, &temp);
         
