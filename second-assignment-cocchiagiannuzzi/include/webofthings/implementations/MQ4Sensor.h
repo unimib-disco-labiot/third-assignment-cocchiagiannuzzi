@@ -16,15 +16,11 @@ private:
         return readings[0];
     }
 
-    ReadingFloat* getLPGValue() {
-        return (ReadingFloat*) getLPGReading()->getValue();
-    }
-
 public:
     MQ4Sensor(uint8_t _pin, unsigned long updatePeriod = 1000) : WoTSensor("Gas Sensor", updatePeriod) {
         MQ4 =  new MQUnifiedsensor("ESP8266", Voltage_Resolution, ADC_Bit_Resolution, _pin, "MQ-4");
 
-        addReading(new Reading("LPG", FLOAT, "burn", "ppM"));
+        addReading(new Reading("LPG", Reading::FLOAT, "burn", "ppM"));
     }
 
     ~MQ4Sensor() {
@@ -62,14 +58,13 @@ public:
 
         MQ4->setA(-0.318); 
         MQ4->setB(1.133);
-        getLPGReading()->setValue(new ReadingFloat(MQ4->readSensor()));
+        getLPGReading()->setValue(MQ4->readSensor());
 
         notifyMQTTClient();
     }
 
-
-    float getValue() {
-        return getLPGValue()->getValue();
+    float getLPGValue() {
+        return *((float*) getLPGReading()->getValue());
     }
 };
 

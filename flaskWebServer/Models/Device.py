@@ -2,7 +2,7 @@ import json
 
 
 class Device:
-    def __init__(self, MAC_address, sensors, actuators, switchInflux='OFF', switchMYSQL='OFF'):
+    def __init__(self, MAC_address, sensors, actuators, switchInflux=True, switchMYSQL=True):
         self.MAC_address = MAC_address
         self.sensors = sensors
         self.actuators = actuators

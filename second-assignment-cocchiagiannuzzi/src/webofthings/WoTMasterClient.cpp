@@ -29,7 +29,7 @@ void WoTMasterClient::parseNewClientJson(const String& jsonString) {
         JsonArray readingsArray = sensorObj["readings"].as<JsonArray>();
         for(JsonVariant r : readingsArray) {
             JsonObject readingObj = r.as<JsonObject>();
-            ReadingType type = readingObj["type"];
+            Reading::ReadingType type = readingObj["type"];
             Reading* reading = new Reading(readingObj["name"], type, readingObj["icon"], readingObj["unit"]);
             sensor->addReading(reading);
         }

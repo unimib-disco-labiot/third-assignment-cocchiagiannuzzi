@@ -11,8 +11,10 @@ def on_post(form):
         jsonDict = reformat_onPost_Json(formDict)
         update_data_onPost(formDict)
         payload = json.dumps(jsonDict)
-        if formDict.get("form") == "switch":
+        if formDict.get("form") == "switchInflux":
             app.publish(topicName.influx_db, payload)
+        if formDict.get("form") == "switchMYSQL":
+            app.publish(topicName.mysql_db, payload)
         elif formDict.get("form") == "reading":
             app.publish(topicName.header + "/onPost", payload)
         elif formDict.get("form") == "actuator":
@@ -20,15 +22,13 @@ def on_post(form):
 
 
 def reformat_onPost_Json(formDict):
-    if formDict.get("form") == "switch":
-        if formDict.get('active') == "true":
-            dict = {"active" : True}
-        else:
-            dict = {"active": False}
-        # dict["switchInflux"] = formDict.get('switchInflux')
-        # dict["switchMYSQL"] = formDict.get('switchMYSQL')
+    print(formDict)
+    dict = {"mac_address": formDict.get('mac_address')}
+    if formDict.get("form") == "switchInflux":
+        dict["active"] = True if formDict.get('switchInflux') == "true" else False
+    if formDict.get("form") == "switchMYSQL":
+        dict["active"] = True if formDict.get('switchMYSQL') == "true" else False
     elif formDict.get("form") == "reading":
-        dict = {"mac_address": formDict.get('mac_address')}
         dict["sensors"] = [{
             "name": formDict.get('sensor_name'),
             "readings": [{
@@ -37,7 +37,6 @@ def reformat_onPost_Json(formDict):
             }],
         }]
     elif formDict.get("form") == "actuator":
-        dict = {"mac_address": formDict.get('mac_address')}
         if formDict.get('state') == "True":
             state = True
         else:
@@ -51,13 +50,10 @@ def reformat_onPost_Json(formDict):
 
 def update_data_onPost(formDict):
     device = utility.getDevice(app.devices, formDict.get("mac_address"))
-    if formDict.get("form") == "switch":
-        if formDict.get('active') == "true":
-            app.influx = True
-        else:
-            app.influx = False
-        # device.switchInflux = formDict.get('switchInflux')
-        # device.switchMYSQL = formDict.get('switchMYSQL')
+    if formDict.get("form") == "switchInflux":
+        device.switchInflux = True if formDict.get('switchInflux') == "true" else False
+    if formDict.get("form") == "switchMYSQL":
+        device.switchMYSQL = True if formDict.get('switchMYSQL') == "true" else False
     elif formDict.get("form") == "reading":
         sensor = device.getSensor(formDict.get('sensor_name'))
         reading = sensor.getReading(formDict.get('reading_name'))

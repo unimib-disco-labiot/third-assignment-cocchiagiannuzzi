@@ -56,17 +56,17 @@ const char influx_device_name[] = "home_monitoring";
 
 
 // Entrance
-WiFiSignalSensor wifiSensor;
-DHTSensor dht22Sensor(D3, DHT22, "DHT_22");
-AnalogSensor photoresistor(A0, "photoresistor", "Light", "lightbulb", "%");
-WoTLed led("Entrance Light", D2);
-PIRSensor pirSensor(D7);
+// WiFiSignalSensor wifiSensor;
+// DHTSensor dht22Sensor(D3, DHT22, "DHT_22");
+// AnalogSensor photoresistor(A0, "photoresistor", "Light", "lightbulb", "%");
+// WoTLed led("Entrance Light", D2);
+// PIRSensor pirSensor(D7);
 
 // Greenhouse
-// DHTSensor dht22Sensor(D3, DHT11, "DHT_11");
-// AnalogSensor soilMoistureSensor(A0, "soil_moisture", "Soil moisture", "leaf", "%");
+DHTSensor dht22Sensor(D3, DHT11, "DHT_11");
+AnalogSensor soilMoistureSensor(A0, "soil_moisture", "Soil moisture", "leaf", "%");
 
-// // Kitchen
+// Kitchen
 // WiFiSignalSensor wifiSensor;
 // MQ4Sensor mq4Sensor(A0);
 // AHT20Sensor aht20;

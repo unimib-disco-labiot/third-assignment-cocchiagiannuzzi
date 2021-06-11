@@ -4,7 +4,7 @@
 #include "debugPrint.h"
 #include <Adafruit_AHTX0.h>
 #include "webofthings/WoTSensor.h"
-#include "webofthings/reading/ReadingFloat.h"
+#include "webofthings/Reading.h"
 
 class AHT20Sensor : public WoTSensor {
 private:
@@ -18,18 +18,10 @@ private:
         return readings[1];
     }
 
-    ReadingFloat* getTemperatureValue() {
-        return (ReadingFloat*) getTemperatureReading()->getValue();
-    }
-
-    ReadingFloat* getHumidityValue() {
-        return (ReadingFloat*) getHumidityReading()->getValue();
-    }
-
 public:
     AHT20Sensor(unsigned long updatePeriod = 1000) : WoTSensor("AHT20", updatePeriod) {
-        addReading(new Reading("Temperature", FLOAT, "thermometer-half", "C"));
-        addReading(new Reading("Humidity", FLOAT, "tint", "%"));
+        addReading(new Reading("Temperature", Reading::FLOAT, "thermometer-half", "C"));
+        addReading(new Reading("Humidity", Reading::FLOAT, "tint", "%"));
     }
 
     ~AHT20Sensor() {}
@@ -50,19 +42,18 @@ public:
         sensors_event_t humidity, temp;
         aht.getEvent(&humidity, &temp);
         
-        getTemperatureReading()->setValue(new ReadingFloat(temp.temperature));
-        getHumidityReading()->setValue(new ReadingFloat(humidity.relative_humidity));
+        getTemperatureReading()->setValue(temp.temperature);
+        getHumidityReading()->setValue(humidity.relative_humidity);
 
         notifyMQTTClient();
     }
 
-
-    float getTemperature() {
-        return getTemperatureValue()->getValue();
+    float getTemperatureValue() {
+        return *((float*) getTemperatureReading()->getValue());
     }
 
-    float getHumidity() {
-        return getHumidityValue()->getValue();
+    float getHumidityValue() {
+        return *((float*) getHumidityReading()->getValue());
     }
 };
 

@@ -2,13 +2,13 @@
 #define PIR_SENSOR_H
 
 #include "webofthings/WoTSensor.h"
-#include "webofthings/reading/ReadingBool.h"
+#include "webofthings/Reading.h"
 
 
 class PIRSensor : public WoTSensor {
 public:
     PIRSensor(uint8_t _pin, unsigned long updatePeriod = 2000) : WoTSensor("PIR_sensor", updatePeriod) {
-        addReading(new Reading("PIR Sensor", BOOL, "running", ""));
+        addReading(new Reading("PIR Sensor", Reading::BOOL, "running", ""));
         pin = _pin;
     }
 
@@ -23,11 +23,11 @@ public:
         bool b;
         if(digitalRead(pin)==HIGH){
             b = true;
-            getMovementReading()->setValue(new ReadingBool(b));
+            getMovementReading()->setValue(b);
         }
         else{
             b = false;
-            getMovementReading()->setValue(new ReadingBool(b));
+            getMovementReading()->setValue(b);
         }
         notifyMQTTClient();
     }
@@ -39,8 +39,9 @@ private:
         return readings[0];
     }
 
-    ReadingBool* getMovementValue() {
-        return (ReadingBool*) getMovementReading()->getValue();
+public:
+    bool getMovementValue() {
+        return *((bool*) getMovementReading()->getValue());
     }
 
     

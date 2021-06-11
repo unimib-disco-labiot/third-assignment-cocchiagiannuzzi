@@ -7,10 +7,7 @@
 #include "Singleton.h"
 #include "debugPrint.h"
 
-#include "webofthings/reading/ReadingInt.h"
-#include "webofthings/reading/ReadingFloat.h"
-#include "webofthings/reading/ReadingBool.h"
-#include "webofthings/reading/ReadingString.h"
+#include "webofthings/Reading.h"
 
 class InfluxDBHandler : Singleton {
 private:
@@ -63,39 +60,41 @@ public:
             return;
         }
 
-        check_influxdb();
-        pointDevice->clearFields();
-        pointDevice->clearTags();
-        pointDevice->addTag("device", device_mac_address);
-        pointDevice->addTag("board", "ESP8266");//TODO: Parameter
+        void* value = reading.getValue();
+        if(value != nullptr) {
+            check_influxdb();
+            pointDevice->clearFields();
+            pointDevice->clearTags();
+            pointDevice->addTag("device", device_mac_address);
+            pointDevice->addTag("board", "ESP8266");//TODO: Paramete
+            pointDevice->addTag("sensor", sensor.getName());
 
+            pointDevice->addTag("reading_name", sensor.getName());
 
-        pointDevice->addTag("sensor", sensor.getName());
-        pointDevice->addTag("reading_name", reading.getName());
+            switch(reading.getType()) {
+                case Reading::INT:
+                    pointDevice->addField(reading.getName(), *((int*)value));
+                    break;
+                case Reading::FLOAT:
+                    pointDevice->addField(reading.getName(), *((float*)value));
+                    break;
+                case Reading::BOOL:
+                    pointDevice->addField(reading.getName(), *((bool*)value));
+                    break;
+                case Reading::STRING:
+                    pointDevice->addField(reading.getName(), *((String*)value));
+                    break;
+                case Reading::EVENT:
+                    pointDevice->addField(reading.getName(), "Event occurred");
+                    break;
+            }
 
-        switch(reading.getType()) {
-            case INT:
-                pointDevice->addField("reading_value", ((ReadingInt*)reading.getValue())->getValue());
-                break;
-            case FLOAT:
-                pointDevice->addField("reading_value", ((ReadingFloat*)reading.getValue())->getValue());
-                break;
-            case BOOL:
-                pointDevice->addField("reading_value", ((ReadingBool*)reading.getValue())->getValue());
-                break;
-            case STRING:
-                pointDevice->addField("reading_value", ((ReadingString*)reading.getValue())->getValue());
-                break;
-            case EVENT:
-                pointDevice->addField("reading_value", "Event occurred");
-                break;
-        }
-
-        print("Writing to InfluxDB: ");
-        println(pointDevice->toLineProtocol());
-        if (!client->writePoint(*pointDevice)) {
-            print("InfluxDB write failed: ");
-            println(client->getLastErrorMessage());
+            print("Writing to InfluxDB: ");
+            println(pointDevice->toLineProtocol());
+            if (!client->writePoint(*pointDevice)) {
+                print("InfluxDB write failed: ");
+                println(client->getLastErrorMessage());
+            }
         }
     }
 

@@ -51,7 +51,7 @@ def handle_message(client, userdata, message):
         topic=message.topic,
         payload=message.payload.decode()
     )
-    print("Message from " + data.get("topic") + ":\n " + data.get("payload"))
+    # print("Message from " + data.get("topic") + ":\n " + data.get("payload"))
     utility.handle_topic(data)
 
 

@@ -6,11 +6,6 @@
 #include <ArduinoJson.h>
 #include "webofthings/topicNames.h"
 #include "webofthings/Reading.h"
-#include "webofthings/reading/ReadingBool.h"
-#include "webofthings/reading/ReadingEvent.h"
-#include "webofthings/reading/ReadingFloat.h"
-#include "webofthings/reading/ReadingInt.h"
-#include "webofthings/reading/ReadingString.h"
 #include "InfluxDBHandler.h"
 
 WoTMaster::WoTMaster() {
@@ -102,27 +97,26 @@ void WoTMaster::onSensorDataUpdate(const String& jsonString) {
                 JsonObject readingObj = r.as<JsonObject>();
                 Reading* reading = sensor->findReading(readingObj["name"]);
                 if(reading != nullptr) {
-                    ReadingType type = readingObj["type"];
+                    Reading::ReadingType type = readingObj["type"];
                     switch(type) {
-                        case INT:
-                            reading->setValue(new ReadingInt(readingObj["value"].as<int>()));
+                        case Reading::INT:
+                            reading->setValue(readingObj["value"].as<int>());
                             break;
-                        case FLOAT:
-                            reading->setValue(new ReadingFloat(readingObj["value"].as<float>()));
+                        case Reading::FLOAT:
+                            reading->setValue(readingObj["value"].as<float>());
                             break;
-                        case BOOL:
-                            reading->setValue(new ReadingBool(readingObj["value"].as<bool>()));
+                        case Reading::BOOL:
+                            reading->setValue(readingObj["value"].as<bool>());
                             break;
-                        case STRING:
-                            reading->setValue(new ReadingString(readingObj["value"].as<String>()));
+                        case Reading::STRING:
+                            reading->setValue(readingObj["value"].as<String>());
                             break;
-                        case EVENT:
-                            reading->setValue(new ReadingEvent());
+                        case Reading::EVENT:
+                            // reading->setValue();//TODO: 
                             break;
                         default:
                             break;
                     }
-                    
                     InfluxDBHandler::getInstance().writeReadingsToInfluxDB(device_mac_address, *sensor, *reading);
                 }
             }

@@ -29,7 +29,7 @@ class MqttHandler:
                 topic=message.topic,
                 payload=message.payload.decode()
             )
-            print("Message from" + data.get("topic") + ": " + data.get("payload"))
+            # print("Message from" + data.get("topic") + ": " + data.get("payload"))
 
         # @self.mqtt.on_subscribe
         # def on_subscribe(client, userdata, mid, qos):
