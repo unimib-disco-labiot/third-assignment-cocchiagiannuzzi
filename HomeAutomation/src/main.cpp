@@ -27,6 +27,7 @@
 #include "webofthings/implementations/WoTLed.h"
 #include "webofthings/implementations/MQ4Sensor.h"
 #include "webofthings/implementations/AHT20Sensor.h"
+#include "webofthings/implementations/StepperMotorBoolState.h"
 
 String topic(MQTT_TOPIC_PREFIX);
 
@@ -62,15 +63,17 @@ const char influx_device_name[] = "home_monitoring";
 // WoTLed led("Entrance Light", D2);
 // PIRSensor pirSensor(D7);
 
-// Greenhouse
-DHTSensor dht22Sensor(D3, DHT11, "DHT_11");
-AnalogSensor soilMoistureSensor(A0, "soil_moisture", "Soil moisture", "leaf", "%");
-
 // Kitchen
 // WiFiSignalSensor wifiSensor;
 // MQ4Sensor mq4Sensor(A0);
 // AHT20Sensor aht20;
 // WoTLed led("Kitchen Light", D3);
+
+// Greenhouse
+DHTSensor dht22Sensor(D3, DHT22, "DHT_22");
+AnalogSensor soilMoistureSensor(A0, "soil_moisture", "Soil moisture", "leaf", "%");
+StepperMotorBoolState windowsStepper("Windows Stepper", D5, D6, D7, D8, 32);
+//TODO: Actuators: Stepper + Pump Relay
 
 
 void setup() {
@@ -85,6 +88,26 @@ void setup() {
   MQTTHandler::getInstance().init(WiFiHandler::getClient(), mqttBrokerIP, mqttPort, mqttClientID.c_str(), mqttUsername, mqttPassword);
 
   WoTHandler::getInstance().init();
+
+  //Events setup
+  dht22Sensor.addEvent(new WoTEvent(
+    [](WoTSensor* sensor) {
+      DHTSensor* dht22 = static_cast<DHTSensor*>(sensor);
+      return dht22->getTemperatureValue() > 25.0f;
+    },
+    [](WoTSensor* sensor) {
+      windowsStepper.setState(true);
+    }
+  ));
+  dht22Sensor.addEvent(new WoTEvent(
+    [](WoTSensor* sensor) {
+      DHTSensor* dht22 = static_cast<DHTSensor*>(sensor);
+      return dht22->getTemperatureValue() < 22.0f;
+    },
+    [](WoTSensor* sensor) {
+      windowsStepper.setState(false);
+    }
+  ));
 }
 
 void loop() {

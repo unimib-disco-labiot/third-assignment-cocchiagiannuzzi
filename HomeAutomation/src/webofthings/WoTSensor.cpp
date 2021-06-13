@@ -17,10 +17,21 @@ WoTSensor::~WoTSensor() {
         delete reading;
     }
     readings.clear();
+
+    
+    for(WoTEvent* event : events) {
+        delete event;
+    }
+    events.clear();
 }
 
 void WoTSensor::addReading(Reading* reading) {
     readings.push_back(reading);
+}
+
+
+void WoTSensor::addEvent(WoTEvent* event) {
+    events.push_back(event);
 }
 
 void WoTSensor::notifyMQTTClient(){
@@ -73,7 +84,9 @@ void WoTSensor::sensorTick() {}
 
 void WoTSensor::tick() {
     sensorTick();
-    //TODO: Handle Events
+    for(WoTEvent* event : events) {
+        event->handleEvent(this);
+    }
 }
 
 void WoTSensor::init() {}

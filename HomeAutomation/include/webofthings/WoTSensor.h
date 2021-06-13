@@ -7,12 +7,16 @@
 #include "webofthings/Reading.h"
 #include "WString.h"
 #include "WoTHandler.h"
+#include "events/WoTEvent.h"
 
 class WoTClient;
+class WoTEvent;
 
 class WoTSensor : public ScheduledTicker::Tickable {
 private:
     static std::set<WoTSensor*> wotSensors;
+
+    std::vector<WoTEvent*> events;
 
 protected:
     String name;
@@ -25,6 +29,7 @@ public:
     ~WoTSensor();
 
     void addReading(Reading* reading);
+    void addEvent(WoTEvent* event);
     
     virtual void init();
     
