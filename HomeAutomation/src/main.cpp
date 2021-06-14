@@ -27,7 +27,7 @@
 #include "webofthings/implementations/WoTLed.h"
 #include "webofthings/implementations/MQ4Sensor.h"
 #include "webofthings/implementations/AHT20Sensor.h"
-#include "webofthings/implementations/StepperMotorBoolState.h"
+#include "webofthings/implementations/ServoMotor.h"
 
 String topic(MQTT_TOPIC_PREFIX);
 
@@ -72,8 +72,8 @@ const char influx_device_name[] = "home_monitoring";
 // Greenhouse
 DHTSensor dht22Sensor(D3, DHT22, "DHT_22");
 AnalogSensor soilMoistureSensor(A0, "soil_moisture", "Soil moisture", "leaf", "%");
-StepperMotorBoolState windowsStepper("Windows Stepper", D5, D6, D7, D8, 32);
-//TODO: Actuators: Stepper + Pump Relay
+ServoMotor windowsMotor("Windows Opener", D7);
+#define PUMP_RELAY_PIN D5
 
 
 void setup() {
@@ -89,6 +89,11 @@ void setup() {
 
   WoTHandler::getInstance().init();
 
+  //Non wot init
+  digitalWrite(PUMP_RELAY_PIN, HIGH);
+  pinMode(PUMP_RELAY_PIN, OUTPUT);
+  digitalWrite(PUMP_RELAY_PIN, LOW);
+
   //Events setup
   dht22Sensor.addEvent(new WoTEvent(
     [](WoTSensor* sensor) {
@@ -96,7 +101,7 @@ void setup() {
       return dht22->getTemperatureValue() > 25.0f;
     },
     [](WoTSensor* sensor) {
-      windowsStepper.setState(true);
+      windowsMotor.setState(180);
     }
   ));
   dht22Sensor.addEvent(new WoTEvent(
@@ -105,7 +110,7 @@ void setup() {
       return dht22->getTemperatureValue() < 22.0f;
     },
     [](WoTSensor* sensor) {
-      windowsStepper.setState(false);
+      windowsMotor.setState(0);
     }
   ));
 }

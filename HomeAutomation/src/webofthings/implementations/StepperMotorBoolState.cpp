@@ -14,6 +14,6 @@ void StepperMotorBoolState::init() {}
 void StepperMotorBoolState::onStateChanged() {
     bool state = *((bool*) getState());
 
-    int multiplier = state ? 1 : -1;
+    int multiplier = state ? 1 : -1;//TODO: This doesn't work
     motor->step(multiplier * changeStateSteps);
 }
