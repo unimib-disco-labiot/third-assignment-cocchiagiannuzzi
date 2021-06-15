@@ -27,7 +27,7 @@
 #include "webofthings/implementations/WoTLed.h"
 #include "webofthings/implementations/MQ4Sensor.h"
 #include "webofthings/implementations/AHT20Sensor.h"
-#include "webofthings/implementations/ServoMotor.h"
+#include "webofthings/implementations/ServoMotorOpener.h"
 
 String topic(MQTT_TOPIC_PREFIX);
 
@@ -70,9 +70,11 @@ const char influx_device_name[] = "home_monitoring";
 // WoTLed led("Kitchen Light", D3);
 
 // Greenhouse
-DHTSensor dht22Sensor(D3, DHT22, "DHT_22");
+DHTSensor dht22Sensor(D6, DHT22, "DHT_22");
 AnalogSensor soilMoistureSensor(A0, "soil_moisture", "Soil moisture", "leaf", "%");
-ServoMotor windowsMotor("Windows Opener", D7);
+#define WINDOW_OPEN_VALUE 140
+#define WINDOW_CLOSED_VALUE 40
+ServoMotorOpener windowsMotor("Windows Opener", D7, false, WINDOW_OPEN_VALUE, WINDOW_CLOSED_VALUE);
 #define PUMP_RELAY_PIN D5
 
 
@@ -94,25 +96,33 @@ void setup() {
   pinMode(PUMP_RELAY_PIN, OUTPUT);
   digitalWrite(PUMP_RELAY_PIN, LOW);
 
-  //Events setup
+  // Events setup
   dht22Sensor.addEvent(new WoTEvent(
     [](WoTSensor* sensor) {
-      DHTSensor* dht22 = static_cast<DHTSensor*>(sensor);
-      return dht22->getTemperatureValue() > 25.0f;
+      DHTSensor* dht22 = (DHTSensor*) sensor;
+      return dht22->hasValue() && dht22->getTemperatureValue() > 28.0f;
     },
     [](WoTSensor* sensor) {
-      windowsMotor.setState(180);
+      println(sensor->getName());
+      DHTSensor* dht22 = static_cast<DHTSensor*>(sensor);
+
+      Serial.println(String("TEMP: ") + dht22->getTemperatureValue());
+      windowsMotor.setOpen(true);
     }
   ));
   dht22Sensor.addEvent(new WoTEvent(
     [](WoTSensor* sensor) {
-      DHTSensor* dht22 = static_cast<DHTSensor*>(sensor);
-      return dht22->getTemperatureValue() < 22.0f;
+      DHTSensor* dht22 = (DHTSensor*) sensor;
+      return dht22->hasValue() && dht22->getTemperatureValue() < 24.0f;
     },
     [](WoTSensor* sensor) {
-      windowsMotor.setState(0);
+      DHTSensor* dht22 = (DHTSensor*) sensor;
+      Serial.println(String("TEMP2: ") + dht22->getTemperatureValue());
+      windowsMotor.setOpen(false);
     }
   ));
+
+  println("Setup DONE");
 }
 
 void loop() {

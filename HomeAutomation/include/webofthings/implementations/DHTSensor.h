@@ -26,6 +26,10 @@ public:
         startTicker();
     }
 
+    bool hasValue() {
+        return getTemperatureReading() != nullptr && getTemperatureReading()->getValue() != nullptr;
+    }
+
     void sensorTick() override{
         float temperature = dht->readTemperature();
         float humidity = dht->readHumidity();  
