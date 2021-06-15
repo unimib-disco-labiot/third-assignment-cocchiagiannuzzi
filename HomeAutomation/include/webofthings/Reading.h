@@ -25,7 +25,9 @@ private:
     
 public:
     Reading(const String& _name, const ReadingType& _type, const String& _iconName, const String& _unitOfMeasure = "")
-            : type(_type), name(_name), iconName(_iconName), unitOfMeasure(_unitOfMeasure) {}
+            : type(_type), name(_name), iconName(_iconName), unitOfMeasure(_unitOfMeasure) {
+        // setValue(0);
+    }
 
     ~Reading() {
         freeValue();

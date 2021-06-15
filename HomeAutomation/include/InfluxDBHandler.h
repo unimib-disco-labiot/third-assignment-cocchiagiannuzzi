@@ -89,7 +89,7 @@ public:
                     break;
             }
 
-            print("Writing to InfluxDB: ");
+            print("DB: ");
             println(pointDevice->toLineProtocol());
             if (!client->writePoint(*pointDevice)) {
                 print("InfluxDB write failed: ");
