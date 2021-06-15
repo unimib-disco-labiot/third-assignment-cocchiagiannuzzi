@@ -1,7 +1,10 @@
 import json
 
+from flask import request, render_template
+
 import app
 import topicName
+import views
 
 from Models.Actuator import Actuator
 from Models.Device import Device
@@ -48,7 +51,8 @@ def getSensorsFromJson(sensorsList):
 def getActuatorFromJson(jsonStr):
     name = jsonStr.get("name")
     state = jsonStr.get("state")
-    return Actuator(name, state)
+    type = jsonStr.get("type")
+    return Actuator(name, state, type)
 
 
 def handle_topic(data):
@@ -77,7 +81,6 @@ def remove_device(payload):
     device = getDevice(app.devices, payload.get("mac_address"))
     if device:
         app.devices.remove(device)
-    pass
 
 
 def add_device(payload):

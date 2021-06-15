@@ -25,19 +25,22 @@
         </div>
     {% endif %}
     {% for device in devices %}
+        {% set device_loop = loop %}
         <div class="container">
         {#        Div device MAC_Address#}
-        <div class="ml-6 mr-6">
+        <div class="device ml-6 mr-6">
             <h1 name="{{ device.MAC_address }}"
                 class="subtitle is-3 pt-5 pb-3 has-text-centered has-text-light-blue">
-                Device {{ loop.index0 }}: {{ device.MAC_address }}
+                Device {{ device_loop.index0 }}: {{ device.MAC_address }}
             </h1>
         </div>
         {#        /Div device MAC_Address#}
         <div id="here{ device.MAC_address }}"
              class="columns is-3 has-text-centered pl-6 pr-6 is-multiline is-mobile"> {# Sensors div #}
             {% for sensor in device.sensors %}
+                 {% set sensor_loop = loop %}
                 {% for reading in sensor.readings %}
+                    {% set reading_loop = loop %}
                     <div class="column is-one-quarter"> {# Sensor box #}
                         <div class=" box value-box">
                             <iframe name="iframe{{ reading.name }}" style="display:none;"></iframe>
@@ -52,7 +55,8 @@
                                     </span> {# ICON #}
                                 <p class="is-size-4">{{ reading.name }}</p>
                                 <br>
-                                <p class="is-size-6">
+                                <p id="{{ device_loop.index0 }}_{{ sensor_loop.index0 }}_{{ reading_loop.index0 }}"
+                                   class="is-size-6 to_refresh" value="none">
                                     {{ reading.value }}
                                     {% if reading.unit == "C" %}
                                         °{{ reading.unit }}
@@ -94,9 +98,15 @@
                             <input type='hidden' name="actuator_name" value="{{ actuator.name }}">
                             <p class="is-size-4">{{ actuator.name }}: </p>
                             <p class="is-size-5 pt-2 pb-5">{{ actuator.state }}</p>
-                            <input type='hidden' name="state" value="{{ not actuator.state }}">
-                            <button class="button is-link is-light" type="submit" formmethod="post">Change state
-                            </button>
+{#                            {% if actuator.type == 3 %}#}
+                                <input type='hidden' name="state" value="{{ not actuator.state }}">
+                                <button class="button is-link is-light" type="submit" formmethod="post">Change state
+                                </button>
+{#                            {% else %}#}
+{#                                <input type='hidden' name="state" value="{{ actuator.state }}">#}
+{#                                <input class="input" type="text" placeholder="actuator.state" value="{{ actuator.state }}">#}
+{#                            {% endif %}#}
+
                         </form>
                     </div>
                 </div>
