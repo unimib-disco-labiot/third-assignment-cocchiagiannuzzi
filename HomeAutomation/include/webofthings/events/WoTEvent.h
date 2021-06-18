@@ -7,8 +7,8 @@ class WoTSensor;
 
 class WoTEvent {
 public:
-    typedef bool (*triggerFunc)(WoTSensor*);
-    typedef void (*outcomeFunc)(WoTSensor*);
+    typedef std::function<bool(WoTSensor*)> triggerFunc;//bool (*triggerFunc)(WoTSensor*);
+    typedef std::function<void(WoTSensor*)> outcomeFunc;//void (*outcomeFunc)(WoTSensor*);
 
     WoTEvent(triggerFunc _trigger, outcomeFunc _outcome);
     ~WoTEvent();

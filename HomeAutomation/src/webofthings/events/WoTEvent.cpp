@@ -9,11 +9,11 @@ WoTEvent::~WoTEvent() {}
 
 
 bool WoTEvent::checkTrigger(WoTSensor* sensor) {
-    return (*trigger)(sensor);
+    return trigger(sensor);
 }
 
 void WoTEvent::execOutcome(WoTSensor* sensor) {
-    (*outcome)(sensor);
+    outcome(sensor);
 }
 
 void WoTEvent::setTrigger(triggerFunc func) {
