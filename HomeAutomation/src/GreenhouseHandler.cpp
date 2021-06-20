@@ -1,4 +1,5 @@
 #include "GreenhouseHandler.h"
+#include <functional>
 
 GreenhouseHandler::GreenhouseHandler() {
     
@@ -43,6 +44,4 @@ void GreenhouseHandler::init() {
             windowsMotor->setOpen(false);
         }
     ));
-
-    ticker.attach()
 }

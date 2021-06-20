@@ -28,13 +28,22 @@ public:
         return instance;
     }
 
-    void init(const char* _ssid, const char* _pass) {
-        ssid = _ssid;
-        pass = _pass;
+    void init(const char* _ssid, const char* _pass, bool shouldStartConnectLoop = true) {
+        static bool initDone = false;
+        if(!initDone) {
+            ssid = _ssid;
+            pass = _pass;
 
-        WiFiHandler::initWiFi();
-        MAC_ADDRESS = String(WiFi.macAddress());
-        wifiConnectTicker.attach_ms_scheduled(500, connectLoopWifi);
+            Serial.println("INIT");
+
+            WiFiHandler::initWiFi();
+            MAC_ADDRESS = String(WiFi.macAddress());
+        }
+        if(shouldStartConnectLoop && !wifiConnectTicker.active()) {
+            wifiConnectTicker.attach_ms_scheduled(500, connectLoopWifi);
+        }
+        
+        initDone = true;
     }
 
     const String& getMacAddress() {
@@ -44,20 +53,6 @@ public:
     static WiFiClient& getClient() {
         static WiFiClient client;
         return client;
-    }
-
-private:
-    static const char* getSSID() {
-        return WiFiHandler::getInstance().ssid;
-    }
-    
-    static const char* getPassword() {
-        return WiFiHandler::getInstance().pass;
-    }
-    
-    static void initWiFi() {
-        WiFi.mode(WIFI_STA);
-        delay(250);
     }
 
     static void connectLoopWifi() {
@@ -76,6 +71,20 @@ private:
             }
             println("\nWiFi Connected!");
         }
+    }
+
+private:
+    static const char* getSSID() {
+        return WiFiHandler::getInstance().ssid;
+    }
+    
+    static const char* getPassword() {
+        return WiFiHandler::getInstance().pass;
+    }
+    
+    static void initWiFi() {
+        WiFi.mode(WIFI_STA);
+        delay(250);
     }
 };
 
