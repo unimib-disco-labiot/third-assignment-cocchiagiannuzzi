@@ -84,7 +84,7 @@ rtcStruct rtcData;
 #define TIME_ZONE 2.0
 #define RTC_MEM_ADDR 129
 #define SHORT_SLEEP_TIME_SEC 20//3600L //1 hour
-#define SHORT_SLEEP_WAKEUPS 10//24
+#define SHORT_SLEEP_WAKEUPS 2//24
 #define HOT_TEMP 25.0f
 
 uint64_t shortSleepTime_us = 1000000L * SHORT_SLEEP_TIME_SEC;
@@ -93,135 +93,135 @@ Ticker ticker;
 ESPDailyTaskNTP dailyTask(WAKE_UP_HOUR, WAKE_UP_MIN, TIME_ZONE, ssid, pass);
 GreenhouseHandler greenhouse;
 
-bool getTomorrowsAvgTemp(float* temp_out) {
+bool getTomorrowsAvgTemp(float& temp_out) {
 
-  WiFiClient client;
-  WiFiHandler::getInstance().init(ssid, pass, false);
+  WiFiHandler::getInstance().init(ssid, pass);
   WiFiHandler::connectLoopWifi();
+  WiFiClient* client = &WiFiHandler::getClient();
 
-
-  if (client.connect(weather_server, 80)) {
-    char request[100];
+  if (client->connect(weather_server, 80)) {
+    char request[200];
     sprintf(request, weather_query, latitude, longitude, WEATHER_API_KEY);
-    client.println(request);
-    client.println(F("Host: api.openweathermap.org"));
-    client.println(F("User-Agent: ArduinoWiFi/1.1"));
-    client.println(F("Connection: close"));
-    client.println();
+    client->println(request);
+    client->println(F("Host: api.openweathermap.org"));
+    client->println(F("User-Agent: ArduinoWiFi/1.1"));
+    client->println(F("Connection: close"));
+    client->println();
   } else {
     Serial.println(F("Connection to api.openweathermap.org failed!\n"));
     return false;
   }
 
-  while (client.connected() && !client.available()) delay(1);   // wait for data
+  while (client->connected() && !client->available()) {
+    delay(1);   // wait for data
+  }
   String result;
-  while (client.connected() || client.available()) {   // read data
-    char c = client.read();
+  while (client->connected() || client->available()) {   // read data
+    char c = client->read();
     result = result + c;
   }
-  client.stop();   // end communication
+  client->stop();   // end communication
 
   result.replace(String((char)255), "");
   println(result); 
-
-  char jsonArray[result.length() + 1];
-  result.toCharArray(jsonArray, sizeof(jsonArray));
-  jsonArray[result.length() + 1] = '\0';
+  
   DynamicJsonDocument doc(6144);
-  DeserializationError error = deserializeJson(doc, jsonArray);
+  DeserializationError error = deserializeJson(doc, result);
 
   if (error) {
     print("deserializeJson() failed: ");
     println(error.c_str());
     return false;
   }
-  //.as<JsonObject>().as<JsonObject>()
-  *temp_out = doc["daily"][1]["temp"]["day"].as<float>();
+  
+  temp_out = doc["daily"][1]["temp"]["day"].as<float>();
   doc.clear();
+  
   return true;
-
 }
 
 void setup() {
   debugPrintBegin(115200);
   println("Hello!");
-  float temp;
-  getTomorrowsAvgTemp(&temp);
-  println(temp);
 
-//     int readSuccess = system_rtc_mem_read(RTC_MEM_ADDR, &rtcData, sizeof(rtcData));
-//     println(rtcData.shouldWakeUpMore);
-//     println(rtcData.wakeUpCounter);
-//     if(!readSuccess || rtcData.wakeUpCounter > 100000) {
-//       rtcData.shouldWakeUpMore = false;
-//       rtcData.wakeUpCounter = -1;
-//       system_rtc_mem_write(RTC_MEM_ADDR, &rtcData, sizeof(rtcData));
-//       println("Read RTC memory failed");
-//     }
+    int readSuccess = system_rtc_mem_read(RTC_MEM_ADDR, &rtcData, sizeof(rtcData));
+    println(rtcData.shouldWakeUpMore);
+    println(rtcData.wakeUpCounter);
+    if(!readSuccess || rtcData.wakeUpCounter > 100000) {
+      rtcData.shouldWakeUpMore = false;
+      rtcData.wakeUpCounter = -1;
+      system_rtc_mem_write(RTC_MEM_ADDR, &rtcData, sizeof(rtcData));
+      println("Read RTC memory failed");
+    }
 
 // rtcData.shouldWakeUpMore = false;
-//     if(!rtcData.shouldWakeUpMore) {
-//       // dailyTask.sleepOneDay();
+    if(!rtcData.shouldWakeUpMore) {
+      dailyTask.sleepOneDay();
 
-//       float tomorrowsAvgTemp;
-//       bool ok = getTomorrowsAvgTemp(&tomorrowsAvgTemp);
-//       println(String("Checking if tomorrow's temperature is going to be over ") + HOT_TEMP);
-//       if(ok) {
-//         if(tomorrowsAvgTemp > HOT_TEMP) {
-//           rtcData.shouldWakeUpMore = true;
-//           rtcData.wakeUpCounter = SHORT_SLEEP_WAKEUPS;
+      float tomorrowsAvgTemp = -1;
+      bool ok = getTomorrowsAvgTemp(tomorrowsAvgTemp);
+      println(String("Checking if tomorrow's temperature is going to be over ") + HOT_TEMP);
+      if(ok) {
+        if(tomorrowsAvgTemp > HOT_TEMP) {
+          rtcData.shouldWakeUpMore = true;
+          rtcData.wakeUpCounter = SHORT_SLEEP_WAKEUPS;
 
-//           println(String("Tomorrow is going to be hot(") + tomorrowsAvgTemp + "). I'm going to wake up each " + SHORT_SLEEP_TIME_SEC + " seconds for " + SHORT_SLEEP_WAKEUPS + " times." );
+          println(String("Tomorrow is going to be hot(") + tomorrowsAvgTemp + "°C). I'm going to wake up each " + SHORT_SLEEP_TIME_SEC + " seconds for " + SHORT_SLEEP_WAKEUPS + " times." );
           
-//           system_rtc_mem_write(RTC_MEM_ADDR, &rtcData, sizeof(rtcData));
-//         }
-//       }
-//       else {
-//         println(String("Unable to connect to ") + weather_server);
-//       }
-//     }
+          system_rtc_mem_write(RTC_MEM_ADDR, &rtcData, sizeof(rtcData));
+        }
+      }
+      else {
+        println(String("Unable to connect to ") + weather_server);
+      }
+    }
 
     println("Starting up!");
 
     WoTSensor::initAllSensors();
     WoTActuator::initAllActuators();
+    println("Sensors and Actuators initialized");
 
     WiFiHandler::getInstance().init(ssid, pass);
+    println("WiFi initialized");
     MYSQLHandler::getInstance().init(mysql_user, mysql_password, mysql_port, mysql_server_addr, WiFiHandler::getInstance().getClient());
+    println("MYSQLHandler initialized");
     InfluxDBHandler::getInstance().init(influx_url, influx_org, influx_bucket, influx_token, influx_device_name);
+    println("InfluxDBHandler initialized");
     MQTTHandler::getInstance().init(WiFiHandler::getClient(), mqttBrokerIP, mqttPort, mqttClientID.c_str(), mqttUsername, mqttPassword);
+    println("InfluxDBHandler initialized");
 
     WoTHandler::getInstance().init();
-
+    println("WoTHandler initialized");
 
     greenhouse.init();
 
     println("Setup DONE");
 
-    // println(String("Sleeping again in ") + AWAKE_TIME_SEC + " seconds, for 1 day.");
 
+    ticker.attach_scheduled(AWAKE_TIME_SEC, []() {
+      MQTTHandler::getClient().disconnect();
+      WiFiClient::stopAll();
 
-    // ticker.attach_scheduled(AWAKE_TIME_SEC, []() {
-    //   println("Going to sleep.");
-    //   MQTTHandler::getClient().disconnect();
-    //   WiFiClient::stopAll();
+      if(rtcData.shouldWakeUpMore) {
+        if(rtcData.wakeUpCounter > 0) {
+          rtcData.wakeUpCounter--;
+        }
+        else {
+          rtcData.shouldWakeUpMore = false;
+        }
+        
+        system_rtc_mem_write(RTC_MEM_ADDR, &rtcData, sizeof(rtcData));
 
-    //   if(rtcData.shouldWakeUpMore) {
-    //     if(rtcData.wakeUpCounter > 0) {
-    //       rtcData.wakeUpCounter--;
-    //     }
-    //     else {
-    //       rtcData.shouldWakeUpMore = false;
-    //     }
-    //     system_rtc_mem_write(RTC_MEM_ADDR, &rtcData, sizeof(rtcData));
+        println(String() + rtcData.wakeUpCounter + " wakeups remaining. Sleeping for " + SHORT_SLEEP_TIME_SEC + " seconds.");
 
-    //     ESP.deepSleep(shortSleepTime_us);
-    //   }
-    //   else{
-    //       dailyTask.backToSleep();
-    //   }
-    // });
-  
+        ESP.deepSleep(shortSleepTime_us);
+      }
+      else{
+          println(String("Goung to sleep until ") + WAKE_UP_HOUR + ":" + WAKE_UP_MIN);
+          dailyTask.backToSleep();
+      }
+    });
 }
 
 void loop() {
