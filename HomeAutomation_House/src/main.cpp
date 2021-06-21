@@ -23,6 +23,7 @@
 
 
 #include "EntranceHandler.h"
+#include "KitchenHandler.h"
 
 String topic(MQTT_TOPIC_PREFIX);
 
@@ -53,6 +54,7 @@ const char influx_device_name[] = "home_monitoring";
 
 // Entrance
 EntranceHandler entrance;
+KitchenHandler kitchen;
 
 
 void setup() {
@@ -62,7 +64,8 @@ void setup() {
     println("Starting up!");
 
     entrance.init();
-    
+    kitchen.init();
+
     WoTSensor::initAllSensors();
     WoTActuator::initAllActuators();
     println("Sensors and Actuators initialized");
