@@ -53,7 +53,7 @@ const char influx_device_name[] = "home_monitoring";
 
 
 // Entrance
-EntranceHandler entrance;
+// EntranceHandler entrance;
 KitchenHandler kitchen;
 
 
@@ -63,8 +63,6 @@ void setup() {
 
     println("Starting up!");
 
-    entrance.init();
-    kitchen.init();
 
     WoTSensor::initAllSensors();
     WoTActuator::initAllActuators();
@@ -82,6 +80,8 @@ void setup() {
     WoTHandler::getInstance().init();
     println("WoTHandler initialized");
 
+    entrance.init();
+    kitchen.init();
 
     println("Setup DONE");
 

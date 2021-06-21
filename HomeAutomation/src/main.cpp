@@ -154,9 +154,9 @@ void setup() {
       println("Read RTC memory failed");
     }
 
-// rtcData.shouldWakeUpMore = false;
+rtcData.shouldWakeUpMore = false;
     if(!rtcData.shouldWakeUpMore) {
-      dailyTask.sleepOneDay();
+      // dailyTask.sleepOneDay();
 
       float tomorrowsAvgTemp = -1;
       bool ok = getTomorrowsAvgTemp(tomorrowsAvgTemp);
@@ -178,7 +178,6 @@ void setup() {
 
     println("Starting up!");
 
-    greenhouse.init();
 
     
     WoTSensor::initAllSensors();
@@ -197,6 +196,7 @@ void setup() {
     WoTHandler::getInstance().init();
     println("WoTHandler initialized");
 
+    greenhouse.init();
 
     println("Setup DONE");
 

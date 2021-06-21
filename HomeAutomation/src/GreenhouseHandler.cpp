@@ -18,7 +18,7 @@ void GreenhouseHandler::init() {
     digitalWrite(PUMP_RELAY_PIN, HIGH);
     pinMode(PUMP_RELAY_PIN, OUTPUT);
 
-    float soilMoisturePercent = soilMoistureSensor->getAnalogValue() / 1024;
+    float soilMoisturePercent = analogRead(SOIL_MOISTURE_MAX) / 1024;
 
     println(String("Soil Moisture: ") + soilMoisturePercent + "%");
 
@@ -33,8 +33,6 @@ void GreenhouseHandler::init() {
     else {
         println("Skipping irrigation.");
     }
-
-
 
     // Events setup
     dht22Sensor->addEvent(new WoTEvent(
