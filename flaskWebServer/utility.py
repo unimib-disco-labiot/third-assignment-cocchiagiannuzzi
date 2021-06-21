@@ -1,10 +1,7 @@
 import json
 
-from flask import request, render_template
-
 import app
 import topicName
-import views
 
 from Models.Actuator import Actuator
 from Models.Device import Device
@@ -101,13 +98,11 @@ def add_device(payload):
 
 
 def update_sensor(payload):
-    i = 0
     device = getDevice(app.devices, payload.get("mac_address"))
     if device:
         sensor = device.getSensor(payload.get("name"))
         if sensor:
-            for reading in sensor.readings:
-                if i < len(payload.get("readings")):
-                    reading.value = payload.get("readings")[i].get('value')
-                i += 1
+            for idx, reading in enumerate(sensor.readings):
+                if idx < len(payload.get("readings")):
+                    reading.value = payload.get("readings")[idx].get('value')
     pass

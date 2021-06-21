@@ -23,8 +23,8 @@
                 </article>
             </div>
         </div>
-    {% endif %}
-    {% for device in devices %}
+    {% else %}
+        {% for device in devices %}
         {% set device_loop = loop %}
         <div class="container">
         {#        Div device MAC_Address#}
@@ -182,6 +182,8 @@
         {# Switch DIV #}
 
     {% endfor %}
+    {% endif %}
+
 
     {#    {% if devices %}#}
     {#        <div class="container mt-6">#}
