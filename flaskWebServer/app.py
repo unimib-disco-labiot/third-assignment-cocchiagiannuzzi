@@ -1,6 +1,6 @@
 import json
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_mqtt import Mqtt
 
 import topicName
@@ -23,7 +23,6 @@ mqtt_settings = config_data['mqtt_settings']
 application.config.update(mqtt_settings)
 
 mqtt = Mqtt(application)
-
 
 
 @mqtt.on_connect()
