@@ -178,6 +178,9 @@ void setup() {
 
     println("Starting up!");
 
+    greenhouse.init();
+
+    
     WoTSensor::initAllSensors();
     WoTActuator::initAllActuators();
     println("Sensors and Actuators initialized");
@@ -194,7 +197,6 @@ void setup() {
     WoTHandler::getInstance().init();
     println("WoTHandler initialized");
 
-    greenhouse.init();
 
     println("Setup DONE");
 

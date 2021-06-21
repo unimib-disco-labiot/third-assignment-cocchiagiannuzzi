@@ -1,0 +1,1 @@
+#define MQTT_TOPIC_PREFIX "cocchiagiannuzzi"

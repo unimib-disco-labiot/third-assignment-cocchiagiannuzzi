@@ -29,8 +29,6 @@ public:
     ~GreenhouseHandler();
 
     void init();
-
-    // void sleep();
 };
 
 
