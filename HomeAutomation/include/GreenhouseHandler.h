@@ -2,6 +2,7 @@
 #define GREENHOUSE_HANDLER
 
 #include <Arduino.h>
+#include <Ticker.h>
 #include "EnvironmentHandler.h"
 
 #include "webofthings/implementations/DHTSensor.h"
@@ -17,9 +18,14 @@
 #define WINDOW_OPEN_VALUE 140
 #define WINDOW_CLOSED_VALUE 40
 
+#define SOIL_MOISTURE_MAX 80.0f
+#define IRRIGATION_TIME_SECS 5
+
 
 class GreenhouseHandler : public EnvironmentHandler {
 private:
+    Ticker ticker;
+
     DHTSensor* dht22Sensor;
     AnalogSensor* soilMoistureSensor;
     ServoMotorOpener* windowsMotor;

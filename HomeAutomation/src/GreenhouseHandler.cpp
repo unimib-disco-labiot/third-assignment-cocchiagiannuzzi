@@ -17,7 +17,24 @@ GreenhouseHandler::~GreenhouseHandler() {
 void GreenhouseHandler::init() {
     digitalWrite(PUMP_RELAY_PIN, HIGH);
     pinMode(PUMP_RELAY_PIN, OUTPUT);
-    digitalWrite(PUMP_RELAY_PIN, LOW);
+
+    float soilMoisturePercent = soilMoistureSensor->getAnalogValue() / 1024;
+
+    println(String("Soil Moisture: ") + soilMoisturePercent + "%");
+
+    if(soilMoisturePercent < SOIL_MOISTURE_MAX) {
+        println("Starting irrigation.");
+
+        digitalWrite(PUMP_RELAY_PIN, LOW);
+        ticker.once_scheduled(IRRIGATION_TIME_SECS, []() {
+            digitalWrite(PUMP_RELAY_PIN, HIGH);
+        });
+    }
+    else {
+        println("Skipping irrigation.");
+    }
+
+
 
     // Events setup
     dht22Sensor->addEvent(new WoTEvent(
