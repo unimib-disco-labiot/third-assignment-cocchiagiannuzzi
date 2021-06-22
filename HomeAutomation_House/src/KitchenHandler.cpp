@@ -70,6 +70,9 @@ void KitchenHandler::init() {
         }
         bot.getUpdates(bot.message[0][1]);
         botExecMessages();
+        for (int i = 1; i < bot.message[0][0].toInt() + 1; i++) {
+            bot.sendMessage(bot.message[i][4], "Test.ugz", "");
+        }
     });
 
     // Events setup
