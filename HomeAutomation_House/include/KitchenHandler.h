@@ -3,7 +3,9 @@
 
 #include <Arduino.h>
 #include <Ticker.h>
+#include <ESP8266TelegramBOT.h>
 #include "EnvironmentHandler.h"
+#include "secrets.h"
 
 #include "webofthings/implementations/MQ4Sensor.h"
 #include "webofthings/implementations/WoTLed.h"
@@ -17,9 +19,13 @@
 
 #define METHANE_THRESHOLD 300
 
+#define BOT_MTBS 1000
+
 class KitchenHandler : public EnvironmentHandler {
 private:
     Ticker ticker;
+    Ticker telegramTicker;
+    TelegramBOT bot{BOT_TOKEN, BOT_NAME, BOT_USERNAME};
 
     MQ4Sensor* mq4;
     WoTLed* light1;
@@ -27,6 +33,7 @@ private:
     ServoMotorOpener* servo;
 
     void soundAlarm();
+    void botExecMessages();
 
 public: 
     KitchenHandler();

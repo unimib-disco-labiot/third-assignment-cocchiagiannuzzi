@@ -21,3 +21,7 @@
 #define INFLUXDB_ORG "labiot-org"    
 #define INFLUXDB_TOKEN " " 
 #define INFLUXDB_BUCKET " "     
+
+#define BOT_NAME "  "                      // name displayed in contact list
+#define BOT_USERNAME "  "              // short bot id
+#define BOT_TOKEN "  :  "      // authorization token
