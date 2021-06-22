@@ -3,7 +3,9 @@
 
 #include <Arduino.h>
 #include <Ticker.h>
+#include <ESP8266TelegramBOT.h>
 #include "EnvironmentHandler.h"
+#include "secrets.h"
 
 #include "webofthings/implementations/WiFiSignalSensor.h"
 #include "webofthings/implementations/AHT20Sensor.h"
@@ -15,6 +17,8 @@
 #define LIGHT_PIN1 D3
 #define LIGHT_PIN2 D4
 
+#define BOT_MTBS 1000
+
 class EntranceHandler : public EnvironmentHandler {
 private:
     WiFiSignalSensor* wifiSensor;
@@ -24,8 +28,11 @@ private:
     PIRSensor* pirSensor;
 
     Ticker ticker;
+    Ticker telegramTicker;
+    TelegramBOT bot{BOT_TOKEN, BOT_NAME, BOT_USERNAME};
 
     void soundAlarm();
+    void botExecMessages();
 
 public: 
     EntranceHandler();
