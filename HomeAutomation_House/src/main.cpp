@@ -53,8 +53,8 @@ const char influx_device_name[] = "home_monitoring";
 
 
 // Entrance
-// EntranceHandler entrance;
-KitchenHandler kitchen;
+EntranceHandler entrance;
+// KitchenHandler kitchen;
 
 
 void setup() {
@@ -70,7 +70,7 @@ void setup() {
 
     WiFiHandler::getInstance().init(ssid, pass);
     println("WiFi initialized");
-    MYSQLHandler::getInstance().init(mysql_user, mysql_password, mysql_port, mysql_server_addr, WiFiHandler::getInstance().getClient());
+    MYSQLHandler::getInstance().init(mysql_user, mysql_password, mysql_port, mysql_server_addr);
     println("MYSQLHandler initialized");
     InfluxDBHandler::getInstance().init(influx_url, influx_org, influx_bucket, influx_token, influx_device_name);
     println("InfluxDBHandler initialized");
@@ -80,8 +80,8 @@ void setup() {
     WoTHandler::getInstance().init();
     println("WoTHandler initialized");
 
-    // entrance.init();
-    kitchen.init();
+    entrance.init();
+    // kitchen.init();
 
     println("Setup DONE");
 

@@ -29,11 +29,15 @@ void EntranceHandler::soundAlarm() {
     char query[200];
     sprintf(query, queryTemplate, WiFiHandler::getInstance().getMacAddress().c_str(), "Entrance Motion Sensor", "Something moved in front of the entrance.");
     MYSQLHandler::getInstance().executeQuery(query);
+
+    //TODO: Telegram
 }
 
 void EntranceHandler::init() {
     digitalWrite(BUZZER_PIN, LOW);
     pinMode(BUZZER_PIN, OUTPUT);
+
+    //TODO: Telegram init
 
     // Events setup
     pirSensor->addEvent(new WoTEvent(

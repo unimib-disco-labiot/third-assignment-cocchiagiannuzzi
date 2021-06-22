@@ -12,6 +12,8 @@ class MYSQLHandler : Singleton {
 private:
     bool isActive = true;
 
+    WiFiClient wifiClient;
+
     MySQL_Connection* connection;
     const char* mysql_user;
     const char* mysql_password; 
@@ -24,12 +26,13 @@ public:
         return instance;
     }
 
-    void init(const char* _mysql_user, const char* _mysql_password, int _mysql_port, IPAddress& _server_address, WiFiClient& _client){
+    void init(const char* _mysql_user, const char* _mysql_password, int _mysql_port, IPAddress& _server_address){
         mysql_user = _mysql_user;
         mysql_password = _mysql_password;
         mysql_port = _mysql_port;
         server_address = &_server_address;
-        connection = new MySQL_Connection((Client*)&_client);
+        //connection = new MySQL_Connection((Client*)&_client);
+        connection = new MySQL_Connection(&wifiClient);
     }
 
     ~MYSQLHandler(){
