@@ -64,7 +64,7 @@ void KitchenHandler::init() {
 
     telegramTicker.attach_ms_scheduled(BOT_MTBS, [this]() {
         static bool init = false;
-        if(WiFi.status() == WL_CONNECTED) {
+        if(!init && WiFi.status() == WL_CONNECTED) {
             bot.begin();
             init = true;
         }

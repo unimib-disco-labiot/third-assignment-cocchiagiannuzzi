@@ -69,6 +69,11 @@ void EntranceHandler::init() {
     pinMode(BUZZER_PIN, OUTPUT);
 
     telegramTicker.attach_ms_scheduled(BOT_MTBS, [this]() {
+        static bool init = false;
+        if(!init && WiFi.status() == WL_CONNECTED) {
+            bot.begin();
+            init = true;
+        }
         bot.getUpdates(bot.message[0][1]);
         botExecMessages();
     });
