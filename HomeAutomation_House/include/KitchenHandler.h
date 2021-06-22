@@ -15,7 +15,7 @@
 #define LIGHT_PIN2 D4
 #define WINDOW_SERVO_PIN D5
 
-#define METHANE_THRESHOLD 1e4
+#define METHANE_THRESHOLD 300
 
 class KitchenHandler : public EnvironmentHandler {
 private:
@@ -26,7 +26,6 @@ private:
     WoTLed* light2;
     ServoMotorOpener* servo;
 
-    
     void soundAlarm();
 
 public: 

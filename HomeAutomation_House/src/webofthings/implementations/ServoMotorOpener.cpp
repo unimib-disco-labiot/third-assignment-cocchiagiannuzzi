@@ -28,11 +28,12 @@ void ServoMotorOpener::init() {
 }
 
 void ServoMotorOpener::onStateChanged() {
-    int state = getTargetPos();
+    motor.write(getTargetPos());
+    // int state = getTargetPos();
 
-    if(state != getActualPos() && state >= 0 && state <= 180) {
-        startMoving();
-    }
+    // if(state != getActualPos() && state >= 0 && state <= 180) {
+    //     startMoving();
+    // }
     WoTActuator::onStateChanged();
 }
 

@@ -6,7 +6,7 @@ KitchenHandler::KitchenHandler() {
     mq4 = new MQ4Sensor(MQ4_PIN);
     light1 = new WoTLed("Kitchen Light 1", LIGHT_PIN1);
     light2 = new WoTLed("Kitchen Light 2", LIGHT_PIN2);
-    servo = new ServoMotorOpener("Kitchen Window", WINDOW_SERVO_PIN, 90, 180, 90);
+    servo = new ServoMotorOpener("Kitchen Window", WINDOW_SERVO_PIN, false, 0, 100);
 }
 
 KitchenHandler::~KitchenHandler() {

@@ -80,7 +80,7 @@ void setup() {
     WoTHandler::getInstance().init();
     println("WoTHandler initialized");
 
-    entrance.init();
+    // entrance.init();
     kitchen.init();
 
     println("Setup DONE");
